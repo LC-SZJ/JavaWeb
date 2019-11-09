@@ -25,5 +25,3 @@ hs_err_pid*
 # 忽略img文件夹
 img/
 
-# 忽略BootStrapTemplate文件
-BootStrapTemplate
