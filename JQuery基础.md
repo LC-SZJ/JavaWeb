@@ -14,20 +14,16 @@
 
     >   目前 JQuery 有三个大版本：
     >
-    >   *   `1.x`：兼容ie678,使用最为广泛的，官方只做BUG维护，
-    >          		 功能不再新增。因此一般项目来说，使用1.x版本就可以了，
-    >          		 最终版本：1.12.4 (2016年5月20日)
-    >   *   `2.x`：不兼容ie678，很少有人使用，官方只做BUG维护，
-    >          		 功能不再新增。如果不考虑兼容低版本的浏览器可以使用2.x，
-    >          		 最终版本：2.2.4 (2016年5月20日)
-    >   *   `3.x`：不兼容ie678，只支持最新的浏览器。除非特殊要求，
-    >          		 一般不会使用3.x版本的，很多老的jQuery插件不支持这个版本。
-    >          		 目前该版本是官方主要更新维护的版本。最新版本：3.2.1（2017年3月20日）
-    >
+    >   *   `1.x`：兼容ie678,使用最为广泛的，官方只做BUG维护，功能不再新增。因此一般项目来说，使用1.x版本就可以了，
+    >        *   最终版本：1.12.4 (2016年5月20日)
+    >    *   `2.x`：不兼容ie678，很少有人使用，官方只做BUG维护，功能不再新增。如果不考虑兼容低版本的浏览器可以使用2.x。
+    >       *    最终版本：2.2.4 (2016年5月20日)
+    >    *   `3.x`：不兼容ie678，只支持最新的浏览器。除非特殊要求，一般不会使用3.x版本的，很多老的jQuery插件不支持这个版本。目前该版本是官方主要更新维护的版本。
+    >        *   最新版本：3.2.1（2017年3月20日）
     >   *   `jquery-xxx.js` 与 `jquery-xxx-min.js` 文件的区别：
-    >       1.  `jquery-xxx.js`：`开发版本`。给程序员看的，有良好的缩进和注释。体积大一些。
-    >       2.  `jquery-xxx-min.js`：`生产版本`。程序中使用，没有缩进。体积小一些。程序加载更快
-
+    >        1.  `jquery-xxx.js`：`开发版本`。给程序员看的，有良好的缩进和注释。体积大一些。
+    >        2.  `jquery-xxx-min.js`：`生产版本`。程序中使用，没有缩进。体积小一些。程序加载更快
+    
 2.  导入JQuery文件的 js 文件：导入min.js文件
 3.  使用`（本次使用 jquery-3.3.1.min.js版本，不同版本之间方法有一些不同）`
 
@@ -427,12 +423,22 @@ $(function () {
 
 ### 1.内容操作
 
-1.  `html()`：获取/设置元素的`标签体内容`		 `<a><font>内容</font></a>  --> <a>内容</a>`
-2.  `text()`：获取/设置元素的标签体`纯文本内容`    `<a><font>内容</font></a>  --> 内容`
+| 方法名称 | 作用                              | 获取的内容                                  |
+| -------- | --------------------------------- | ------------------------------------------- |
+| html()   | 获取/设置元素的`标签体内容`       | `<a><font>内容</font></a>  --> <a>内容</a>` |
+| text()   | 获取/设置元素的标签体`纯文本内容` | `<a><font>内容</font></a>  --> 内容`        |
+| val()    | 获取/设置元素的`value`属性值      |                                             |
 
-3.  `val()`：获取/设置元素的`value`属性值
+
 
 *   示例：
+
+```html
+<input id="myinput" type="text" name="username" value="张三"/><br/>
+<div id="mydiv"><p><a href="#">标题标签</a></p></div>
+```
+
+
 
 ```javascript
  $(function () {
@@ -459,9 +465,219 @@ $(function () {
 
 ### 2.属性操作
 
+#### 1.通用属性操作
+
+| 方法名称     | 作用                |
+| ------------ | ------------------- |
+| attr()       | 获取/设置元素的属性 |
+| removeAttr() | 删除属性            |
+| prop()       | 获取/设置元素的属性 |
+| removeProp() | 删除属性            |
+
+
+
+>   attr和prop区别？
+>
+>   1.  如果操作的是元素的`固有属性`，则建议使用`prop`
+>   2.  如果操作的是元素`自定义的属性`，则建议使用`attr`
+
+*   示例：
+
+```html
+<ul>
+    <li id="bj" name="beijing" xxx="yyy">北京</li>
+    <li id="tj" name="tianjin">天津</li>
+</ul>
+<input type="checkbox" id="hobby" checked/>
+```
+
+
+
+```javascript
+  $(function () {
+      //获取北京节点的name属性值
+     var name = $("#bj").attr("name");
+      alert(name);
+      //设置北京节点的name属性的值为dabeijing
+      $("#bj").attr("name", "dabeijing");
+      //新增北京节点的discription属性 属性值是didu
+      $("#bj").attr("discription", "didu");
+      //删除北京节点的name属性并检验name属性是否存在
+      $("#bj").removeAttr("name");
+      //获得hobby的的选中状态
+      var flag = $("input").prop("checked");
+      alert(flag);
+  });
+```
+
+
+
+#### 2.对class属性操作
+
+| 方法名称      | 作用                   |
+| ------------- | ---------------------- |
+| addClass()    | 添加class属性值        |
+| removeClass() | 删除class属性值        |
+| toggleClass() | 切换class属性          |
+| css()         | 访问匹配元素的样式属性 |
+
+
+
+*   示例：
+
+```css
+/*待用的样式*/
+.second {
+    width: 300px;
+    height: 340px;
+    margin: 20px;
+    background: yellow;
+    border: pink 3px dotted;
+    float: left;
+    font-size: 22px;
+    font-family: Roman;
+}
+```
+
+
+
+```javascript
+ $(function () {
+    //<input type="button" value="采用属性增加样式(改变id=one的样式)"  id="b1"/>
+    $("#b1").click(function () {
+        $("#one").prop("class", "second");
+    });
+
+    //<input type="button" value=" addClass"  id="b2"/>
+    $("#b2").click(function () {
+        $("#one").addClass("second");
+    });
+
+    //<input type="button" value="removeClass"  id="b3"/>
+    $("#b3").click(function () {
+        $("#one").removeClass("second");
+    });
+    //<input type="button" value=" 切换样式"  id="b4"/>
+    $("#b4").click(function () {
+        $("#one").toggleClass("second");
+    });
+    //<input type="button" value=" 通过css()获得id为one背景颜色"  id="b5"/>
+    $("#b5").click(function () {
+        var backgroundColor = $("#one").css("backgroundColor");
+        alert(backgroundColor);
+    });
+    //<input type="button" value=" 通过css()设置id为one背景颜色为绿色"  id="b6"/>
+    $("#b6").click(function () {
+        $("#one").css("backgroundColor", "green");
+    });
+})
+```
+
+
+
+>   *   toggleClass("one")：
+>       *   如果元素对象上存在`class="one"`，则将属性值`one`删除
+>       *   如果元素对象上不存在`class="one"`，则添加
+
+
+
+### 3.CRUD
+
+1. append():父元素将子元素追加到末尾
+    * 对象1.append(对象2): 将对象2添加到对象1元素内部，并且在末尾
+2. prepend():父元素将子元素追加到开头
+    * 对象1.prepend(对象2):将对象2添加到对象1元素内部，并且在开头
+3. appendTo():
+    * 对象1.appendTo(对象2):将对象1添加到对象2内部，并且在末尾
+4. prependTo()：
+    * 对象1.prependTo(对象2):将对象1添加到对象2内部，并且在开头
 
 
 
 
-## 6.案例
+1. after():添加元素到元素后边
+    * 对象1.after(对象2)： 将对象2添加到对象1后边。对象1和对象2是兄弟关系
+2. before():添加元素到元素前边
+    * 对象1.before(对象2)： 将对象2添加到对象1前边。对象1和对象2是兄弟关系
+3. insertAfter()
+    * 对象1.insertAfter(对象2)：将对象2添加到对象1后边。对象1和对象2是兄弟关系
+4. insertBefore()
+    * 对象1.insertBefore(对象2)： 将对象2添加到对象1前边。对象1和对象2是兄弟关系
+
+
+
+```javascript
+ $(function () {
+     // <input type="button" value="将反恐放置到city的后面"  id="b1"/>
+     $("#b1").click(function () {
+         // append
+         // $("#city").append($("#fk"));
+         // prepend
+         $("#fk").appendTo($("#city"));
+     });
+
+     // <input type="button" value="将反恐放置到city的最前面"  id="b2"/>
+     $("#b2").click(function () {
+         // append
+         // $("#city").prepend($("#fk"));
+         // prepend
+         $("#fk").prependTo($("#city"));
+     });
+
+     // <input type="button" value="将反恐插入到天津后面"  id="b3"/>
+     $("#b3").click(function () {
+         // after
+         $("#tj").after($("#fk"));
+         // insertAfter
+         // $("#fk").insertAfter($("#tj"));
+     });
+
+     // <input type="button" value="将反恐插入到天津前面"  id="b4"/>
+     $("#b4").click(function () {
+         // before
+         // $("#tj").before($("#fk"));
+         // insertBefore
+         $("#fk").insertBefore($("#tj"));
+     });
+ });
+```
+
+
+
+1. remove():移除元素
+    * 对象.remove():将对象删除掉
+2. empty():清空元素的所有后代元素。
+    * 对象.empty():将对象的后代元素全部清空，但是保留当前对象以及其属性节点
+
+*   示例：
+
+
+
+```html
+<input type="button" value="删除<li id='bj' name='beijing'>北京</li>" id="b1"/>
+<input type="button" value="删除所有的子节点   清空元素中的所有后代节点(不包含属性节点)" id="b2"/>
+
+<ul id="city">
+    <li id="bj" name="beijing">北京</li>
+    <li id="tj" name="tianjin">天津</li>
+    <li id="cq" name="chongqing">重庆</li>
+</ul>
+<p class="hello">Hello</p> how are <p>you?</p>
+```
+
+
+
+```javascript
+ $(function () {
+  // <input type="button" value="删除<li id='bj' name='beijing'>北京</li>"  id="b1"/>
+  $("#b1").click(function () {
+      $("#bj").remove();
+  });
+
+  // <input type="button" value="删除city所有的li节点   清空元素中的所有后代节点(不包含属性节点)"  id="b2"/>
+   $("#b2").click(function () {
+         $("#city").empty();
+     });
+ });
+```
 
