@@ -29,7 +29,7 @@
         2. cmd --> services.msc：打开服务的窗口
         3. 使用管理员打开 cmd
             * net start mysql：启动 mysql的服务
-            * new stop mysql：关闭 mysql的服务
+            * net stop mysql：关闭 mysql的服务
     * MySQL登陆
         1. mysql -uroot -p密码
         2. mysql -hip地址 -uroot -p链接目标的密码 
