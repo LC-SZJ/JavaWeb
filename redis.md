@@ -161,7 +161,7 @@ OK
 
 
 
-### 3.哈希类型:hash
+### 3.哈希类型:hash(map格式)
 
 1.  存储：`hset key field value`
 2.  获取：
@@ -188,7 +188,7 @@ OK
 
 
 
-### 4.列表类型:list
+### 4.列表类型:list(linkedlist格式)
 
 >   *   简单的字符串列表，按照插入顺序排序。
 >   *   允许元素重复。
@@ -381,5 +381,398 @@ hash
 
 ## 5.Java客户端:Jedis
 
+### 1.概述
 
+
+
+*   Jedis：一款java操作redis数据库的工具
+
+*   使用步骤：
+
+    1.  下载jedis的jar包
+    2.  使用
+
+    ```java
+        @Test
+        public void test1() {
+            // 1.获取连接
+            Jedis jedis = new Jedis("localhost", 6379);
+            // 2.操作
+            jedis.set("username", "zhangsan");
+            // 3.关闭连接
+            jedis.close();
+        }
+    ```
+
+    
+
+### 2.Jedis操作redis中的数据结构
+
+#### 1.字符串类型 string
+
+*   示例：
+
+```java
+    /**
+     * string操作
+     */
+    @Test
+    public void test2() {
+        Jedis jedis = new Jedis(); // 如果使用空参构造，默认值"localhost",6379端口
+        jedis.set("username", "zhangsan");
+        String username = jedis.get("username");
+        System.out.println(username);
+        /*
+            setex()：可以指定存储的过期时间,到期自动删除
+            将activecode,haha，键值对存入redis，并且20秒后会自动删除该键值对
+         */
+        jedis.setex("activecode", 20, "haha");
+        // 关闭连接
+        jedis.close();
+    }
+```
+
+
+
+#### 2.哈希类型 hash(map格式)
+
+*   示例：
+
+```java
+    /**
+     * 操作hash类型
+     */
+    @Test
+    public void test3() {
+        // 1.获取连接
+        Jedis jedis = new Jedis();
+        // 2.存储
+        jedis.hset("user", "name", "lisi");
+        jedis.hset("user", "age", "21");
+        jedis.hset("user", "gender", "male");
+
+        // 3.获取
+        String name = jedis.hget("user", "name");
+        System.out.println(name);
+
+        // 4.删除
+        jedis.hdel("user", "gender");
+
+        // 5.遍历
+        Map<String, String> user = jedis.hgetAll("user");
+        Set<Map.Entry<String, String>> entrySet = user.entrySet();
+        for (Map.Entry<String, String> entry : entrySet) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            System.out.println(key + ":" + value);
+        }
+        // 关闭连接
+        jedis.close();
+    }
+```
+
+
+
+#### 3.列表类型 list(linkedlist格式)
+
+*   示例：
+
+```java
+    /**
+     * 列表list操作,相当于linkedlist
+     */
+    @Test
+    public void test4() {
+        // 1.获取redis数据库连接
+        Jedis jedis = new Jedis();
+        // 2.操作
+        // list存储
+        jedis.lpush("mylist", "a", "b", "c");
+        jedis.rpush("mylist", "a", "b", "c");
+        // list范围获取
+        List<String> mylist = jedis.lrange("mylist", 0, -1);
+        System.out.println(mylist);
+        // list 弹出
+        String ele1 = jedis.lpop("mylist");
+        String ele2 = jedis.rpop("mylist");
+
+        System.out.println(ele1);
+        System.out.println(ele2);
+        
+        List<String> myList2 = jedis.lrange("mylist", 0, -1);
+        System.out.println(myList2);
+        // 关闭连接
+        jedis.close();
+    }
+```
+
+
+
+#### 4.集合类型 set
+
+*   示例：
+
+```java
+    /**
+     * 集合类型 set
+     */
+    @Test
+    public void test5() {
+        // 1.获取连接
+        Jedis jedis = new Jedis();
+        // 2.操作
+        // set 存储
+        jedis.sadd("myset", "孙悟空");
+        jedis.sadd("myset", "亚瑟");
+        jedis.sadd("myset", "后羿");
+
+        // set 删除
+        jedis.srem("myset", "亚瑟");
+
+        // set 获取
+        Set<String> myset = jedis.smembers("myset");
+        System.out.println(myset);
+
+        // 3.关闭连接
+        jedis.close();
+    }
+```
+
+
+
+#### 4.有序集合 sortedset
+
+*   示例
+
+```java
+    /**
+     * 有序集合 sortedset
+     */
+    @Test
+    public void test6() {
+        // 1.获取连接
+        Jedis jedis = new Jedis();
+        // 2.操作
+        // sortedset 添加
+        jedis.zadd("mysortedset", 5, "孙悟空");
+        jedis.zadd("mysortedset", 10, "周元");
+        jedis.zadd("mysortedset", 100, "萧炎");
+        // sortedset 删除
+        jedis.zrem("mysortedset", "孙悟空");
+        // sortedset 获取
+        Set<String> mysortedset = jedis.zrange("mysortedset", 0, -1);
+        System.out.println(mysortedset);
+        // 3.关闭连接
+        jedis.close();
+    }
+```
+
+
+
+### 3.jedis连接池: jedisPool
+
+*   使用：
+    1.  创建`JedisPoo`连接池对象
+    2.  调用方法`getResource()`方法获取`Jedis连接`
+*   示例：
+
+```java
+    /**
+     * jedis连接池 jedisPool
+     */
+    @Test
+    public void test7() {
+        // 0.创建一个配置对象
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(50);
+        config.setMaxIdle(10);
+
+        // 1.创建Jedis连接池对象
+        JedisPool jedisPool = new JedisPool(config, "localhost", 6379);
+        // 2.获取连接
+        Jedis jedis = jedisPool.getResource();
+        // 3.使用
+        jedis.set("username", "lisi");
+        // 4.归还连接
+        jedis.close();
+    }
+```
+
+
+
+### 4.jedis连接池工具类
+
+*   jedis.properties
+
+```properties
+host=127.0.0.1
+port=6379
+maxTotal=50
+maxIdle=10
+```
+
+
+
+*   jedis.properties详细配置
+
+```properties
+#最大活动对象数     
+redis.pool.maxTotal=1000    
+#最大能够保持idel状态的对象数      
+redis.pool.maxIdle=100  
+#最小能够保持idel状态的对象数   
+redis.pool.minIdle=50    
+#当池内没有返回对象时，最大等待时间    
+redis.pool.maxWaitMillis=10000    
+#当调用borrow Object方法时，是否进行有效性检查    
+redis.pool.testOnBorrow=true    
+#当调用return Object方法时，是否进行有效性检查    
+redis.pool.testOnReturn=true  
+#“空闲链接”检测线程，检测的周期，毫秒数。如果为负值，表示不运行“检测线程”。默认为-1.  
+redis.pool.timeBetweenEvictionRunsMillis=30000  
+#向调用者输出“链接”对象时，是否检测它的空闲超时；  
+redis.pool.testWhileIdle=true  
+# 对于“空闲链接”检测线程而言，每次检测的链接资源的个数。默认为3.  
+redis.pool.numTestsPerEvictionRun=50  
+#redis服务器的IP    
+redis.ip=xxxxxx  
+#redis服务器的Port    
+redis1.port=6379   
+```
+
+
+
+*   JedisPoolUtils工具类
+
+```java
+package indi.szj.jedis.util;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import java.util.ResourceBundle;
+
+/**
+ * JedisPool工具类
+ * 用于加载配置文件，读取配置文件的参数
+ * 提供获取连接的方法
+ */
+public class JedisPoolUtils {
+
+    private static JedisPool jedisPool;
+
+    // 只要该类一加载，就读取配置文件
+/*
+    static {
+        // 创建Properties对象
+        Properties pro = new Properties();
+        InputStream is = JedisPoolUtils.class.getClassLoader().getResourceAsStream("jedis.properties");
+        System.out.println(is);
+        try {
+            // 关联文件
+            pro.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 获取数据，设置到JedisPoolConfig对象中
+        JedisPoolConfig config = new JedisPoolConfig();
+        String maxTotal = pro.getProperty("maxTotal");
+        String maxIdle = pro.getProperty("maxIdle");
+        // 设置配置对象数据
+        config.setMaxIdle(Integer.parseInt(maxIdle));
+        config.setMaxTotal(Integer.parseInt(maxTotal));
+        // 初始化连接池对象
+        jedisPool = new JedisPool(config, pro.getProperty("host"), Integer.parseInt(pro.getProperty("port")));
+    }
+*/
+
+    /**
+     * ResourceBundle属于java.util.ResourceBundle包
+     *      专门处理properties文件
+     *      不用new，可直接使用--->ResourceBundle.getBundle("config");
+     *      getBundle(String baseName)方法中baseName就是配置文件名，我们这里是config
+     *      getBundle(String baseName)方法获取的对象有getString(String key)方法
+     *      getString(String key)方法可获取配置文件中的值，key就是配置文件key的名字
+     *      因为获取的值都是String形式，所以要转换一下-->Integer
+     */
+
+    static {
+        ResourceBundle jedis = ResourceBundle.getBundle("jedis");
+        int maxTotal = Integer.parseInt(jedis.getString("maxTotal"));
+        int maxIdle = Integer.parseInt(jedis.getString("maxIdle"));
+        int port = Integer.parseInt(jedis.getString("port"));
+        String host = jedis.getString("host");
+
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(maxTotal);
+        config.setMaxIdle(maxIdle);
+
+        jedisPool = new JedisPool(config, host, port);
+    }
+
+    /**
+     * 获取连接对象的方法
+     *
+     * @return
+     */
+    public static Jedis getJedis() {
+        return jedisPool.getResource();
+    }
+
+    /**
+     * 释放资源
+     * 归还连接对象
+     *
+     * @param jedis
+     */
+    public static void close(Jedis jedis) {
+        if (jedis != null) {
+            jedis.close();
+        }
+    }
+
+    /**
+     * 释放连接池对象
+     *
+     * @param pool
+     */
+    public static void close(JedisPool pool) {
+        if (pool != null) {
+            pool.close();
+        }
+    }
+
+}
+```
+
+
+
+*   test
+
+```java
+    @Test
+    public void test8() {
+        // 通过连接池工具获取
+        Jedis jedis = JedisPoolUtils.getJedis();
+        // 使用
+        jedis.set("msg", "java");
+        // 归还
+        JedisPoolUtils.close(jedis);
+    }
+```
+
+
+
+## 5.案例
+
+>   案例需求：
+>
+>   1.  提供index.html页面，页面中有一个省份 下拉列表
+>   2.   当 页面加载完成后 发送ajax请求，加载所有省份
+
+
+
+>   * 注意：使用redis缓存一些不经常发生变化的数据。
+>   	* 数据库的数据一旦发生改变，则需要更新缓存。
+>   		* 数据库的表执行 增删改的相关操作，需要将redis缓存数据情况，再次存入
+>   		* 在service对应的增删改方法中，将redis数据删除。
 
